@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+</header>
+<main>
+    <div th:if="${posts.size()} == 0" class="empty-message">
+        No posts available.
+    </div>
+    <div th:if="${posts.size()} > 0">
+        <ul>
+            <li th:each="post : ${posts}" th:text="${post}"></li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>
