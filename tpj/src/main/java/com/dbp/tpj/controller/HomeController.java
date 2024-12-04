@@ -9,9 +9,8 @@ import java.util.List;
 public class HomeController {
 
     @GetMapping("/")
-    public String home(Model model) {
-        List<String> posts = new ArrayList<>();
-        model.addAttribute("posts", posts);
+    public String home() {
+        System.out.println("홈페이지 호출 테스트");
         return "home";
     }
 }

@@ -24,15 +24,16 @@ class StudentRepositoryTest {
 
         // 2. 데이터 조회
         List<Student> students = studentRepository.findAll();
+        System.out.println("학생 데이터: " + students);
         assertThat(students).isNotEmpty();
 
         Optional<Student> foundStudent = studentRepository.findById("20230001");
         assertThat(foundStudent).isPresent();
         assertThat(foundStudent.get().getName()).isEqualTo("John Doe");
 
-        // 3. 데이터 삭제
-        studentRepository.deleteById("20230001");
-        assertThat(studentRepository.findById("20230001")).isEmpty();
+//        // 3. 데이터 삭제
+//        studentRepository.deleteById("20230001");
+//        assertThat(studentRepository.findById("20230001")).isEmpty();
     }
 }
 

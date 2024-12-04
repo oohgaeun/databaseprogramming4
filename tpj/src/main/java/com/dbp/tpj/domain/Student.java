@@ -90,4 +90,15 @@ public class Student {
     public void setRtCount(Integer rtCount) {
         this.rtCount = rtCount;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", credit=" + credit +
+                ", rtCount=" + rtCount +
+                '}';
+    }
 }
