@@ -1,45 +1,22 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-}
-
-header {
+/* header 스타일 */
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #4CAF50;
-    padding: 10px 20px;
-    color: white;
-}
-
-header a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-main {
-    text-align: center;
-    margin-top: 50px;
-}
-
-.empty-message {
-    color: #777;
-    font-size: 20px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: #eee;
-    margin: 10px auto;
     padding: 10px;
-    width: 300px;
-    border-radius: 5px;
-    text-align: left;
+    border: solid 1px yellow;
+}
+
+.header a {
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.header .left {
+    font-weight: bold;
+}
+
+.header .right {
+    display: flex;
+    align-items: center;
 }
