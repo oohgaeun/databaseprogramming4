@@ -6,4 +6,5 @@ import com.dbp.tpj.domain.Student;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, String> {
+    boolean existsById(String id); // 학번 중복 확인
 }

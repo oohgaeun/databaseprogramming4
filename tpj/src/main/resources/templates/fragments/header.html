@@ -3,13 +3,24 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       th:fragment="HeaderFragment">
-<div style="border: solid 1px yellow">
-    <h1>Header 영역입니다.</h1>
-    <nav>
+<div class="header">
+    <!-- 좌측: Home 버튼 -->
+    <div class="left">
         <a href="/">Home</a>
-        <a href="/students">학생 관리</a>
-        <a href="/items">물품 관리</a>
-        <a href="/posts">게시물 관리</a>
-    </nav>
+    </div>
+
+    <!-- 우측: 로그인 상태에 따라 버튼 표시 -->
+    <div class="right">
+            <span th:if="${session.loggedInUser == null}">
+                <!-- 로그아웃 상태 -->
+                <a href="/login">로그인</a>
+                <a href="/signup">회원가입</a>
+            </span>
+        <span th:if="${session.loggedInUser != null}">
+                <!-- 로그인 상태 -->
+                <span th:text=" ${session.loggedInUserName} + '님!'"></span>
+                <a href="/logout" style="margin-left: 10px;">로그아웃</a>
+            </span>
+    </div>
 </div>
 </html>

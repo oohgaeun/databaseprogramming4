@@ -6,6 +6,7 @@ import com.dbp.tpj.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+@Service
 public class StudentService {
 
     private final StudentRepository studentRepository;
@@ -15,11 +16,25 @@ public class StudentService {
     }
 
     public void registerStudent(Student student) {
-        // 기본값 설정
-        student.setCredit(100); // 초기 크레딧 설정
-        student.setRtCount(0);  // 초기 거래 수 설정
+        if (studentRepository.existsById(student.getId())) {
+            throw new IllegalArgumentException("이미 존재하는 학번입니다.");
+        }
 
-        // 데이터베이스에 저장
+        student.setCredit(10);
+        student.setRtCount(0);
+
         studentRepository.save(student);
+    }
+
+    public boolean authenticate(String id, String password) {
+        return studentRepository.findById(id)
+                .map(student -> student.getPassword().equals(password))
+                .orElse(false);
+    }
+
+    public String findStudentNameById(String id) {
+        return studentRepository.findById(id)
+                .map(Student::getName) // Student 객체의 이름 가져오기
+                .orElse("Unknown User");
     }
 }
