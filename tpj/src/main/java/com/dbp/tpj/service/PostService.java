@@ -2,6 +2,8 @@ package com.dbp.tpj.service;
 
 import com.dbp.tpj.domain.Post;
 import com.dbp.tpj.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +21,15 @@ public class PostService {
         return postRepository.findAll();
     }
 
+    public Page<Post> getPosts(Pageable pageable) {
+        // Repository의 페이징 메서드를 호출
+        return postRepository.findAll(pageable);
+    }
     // 특정 게시물 조회
-    public Post getPostById(Long postId) {
-        return postRepository.findById(postId).orElse(null);
+    public Post getPostById(Long id) {
+        // Repository를 통해 데이터베이스에서 게시물 조회
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post ID: " + id));
     }
 
     // 게시물 추가
@@ -33,4 +41,6 @@ public class PostService {
     public void deletePost(Long postId) {
         postRepository.deleteById(postId);
     }
+
+
 }

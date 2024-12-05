@@ -2,16 +2,18 @@ package com.dbp.tpj.controller;
 
 import com.dbp.tpj.domain.Post;
 import com.dbp.tpj.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
 
 @Controller
+@RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
 
@@ -19,23 +21,29 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping("/posts")
-    public String listPosts(Model model) {
-        // Service 계층을 통해 게시물 데이터 호출
-        List<Post> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
-        return "postslist"; // templates/postslist.html 반환
+    @GetMapping
+    public String listPosts(@RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "10") int size,
+                            Model model) {
+        Pageable pageable = PageRequest.of(page, size); // 페이지 번호와 크기를 설정
+        Page<Post> postPage = postService.getPosts(pageable); // 페이징된 데이터 가져오기
+
+        model.addAttribute("posts", postPage.getContent()); // 게시물 리스트
+        model.addAttribute("currentPage", postPage.getNumber()); // 현재 페이지
+        model.addAttribute("totalPages", postPage.getTotalPages()); // 총 페이지 수
+
+        return "posts/postslist";
     }
 
-    @GetMapping("/posts/add")
-    public String AddPostForm(Model model) {
-        model.addAttribute("post", new Post());
-        return "postadd"; // templates/postadd.html
-    }
+    @GetMapping("/{id}")
+    public String viewPost(@PathVariable Long id, Model model) {
+        //Service를 통해 게시물 데이터를 가져옴
+        Post post = postService.getPostById(id);
 
-    @PostMapping("/posts/add")
-    public String addPost(@ModelAttribute Post post) {
-        postService.addPost(post);
-        return "redirect:/posts";
+        //가져온 데이터를 모델에 추가하여 뷰에 전달
+        model.addAttribute("post", post);
+
+        //postdetail.html로 이동
+        return "posts/postdetail";
     }
 }
