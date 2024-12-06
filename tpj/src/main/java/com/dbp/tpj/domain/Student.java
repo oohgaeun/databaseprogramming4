@@ -44,6 +44,11 @@ public class Student {
         this.rtCount = rtCount;
     }
 
+    // ID만 초기화하는 생성자(물품 등록에 사용, 이외 학번만 가져갈때 사용할 수 있을 듯)
+    public Student(String id) {
+        this.id = id;
+    }
+
     // Getter와 Setter 메서드
     public String getId() {
         return id;
