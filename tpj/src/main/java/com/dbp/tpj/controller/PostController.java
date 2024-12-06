@@ -1,6 +1,8 @@
 package com.dbp.tpj.controller;
 
+import com.dbp.tpj.domain.Chat;
 import com.dbp.tpj.domain.Post;
+import com.dbp.tpj.service.ChatService;
 import com.dbp.tpj.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +18,11 @@ import java.util.List;
 @RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
+    private final ChatService chatService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, ChatService chatService) {
         this.postService = postService;
+        this.chatService = chatService;
     }
 
     @GetMapping
@@ -39,9 +43,11 @@ public class PostController {
     public String viewPost(@PathVariable Long id, Model model) {
         //Service를 통해 게시물 데이터를 가져옴
         Post post = postService.getPostById(id);
+        List<Chat> chats = chatService.getChatsByPost(post); // 댓글 가져오기
 
         //가져온 데이터를 모델에 추가하여 뷰에 전달
         model.addAttribute("post", post);
+        model.addAttribute("chats", chats);
 
         //postdetail.html로 이동
         return "posts/postdetail";
