@@ -11,9 +11,17 @@ import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    // 특정 사용자가 등록한 물품 조회
+    // 특정 사용자가 등록한 물품 모두 조회
     @Query("SELECT i FROM Item i WHERE i.student.id = :userId")
     List<Item> findByUserId(String userId);
+
+    // 특정 사용자가 등록한 물품 물품명 중복 회피해서 조회
+    @Query("SELECT i.itemName, i.category, COUNT(i) FROM Item i WHERE i.student.id = :userId GROUP BY i.itemName, i.category")
+    List<Object[]> findGroupedItemsByUserId(@Param("userId") String userId);
+
+    // 특정 사용자와 물품명을 기준으로 물품 개수 조회
+    @Query("SELECT i.itemName, COUNT(i) FROM Item i WHERE i.student.id = :userId GROUP BY i.itemName")
+    List<Object[]> findItemCountsByUserId(@Param("userId") String userId);
 
     // 특정 물품 삭제
     void deleteById(Long itemId);
@@ -23,4 +31,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByUserIdAndItemNameAndCategory(@Param("userId") String userId,
                                                   @Param("itemName") String itemName,
                                                   @Param("category") String category);
+
 }

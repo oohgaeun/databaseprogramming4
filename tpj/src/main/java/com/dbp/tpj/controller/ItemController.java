@@ -26,9 +26,9 @@ public class ItemController {
     // 물품 목록 조회
     @GetMapping("/list")
     public String getItemList(Model model, HttpSession session) {
-        String userId = (String) session.getAttribute("loggedInUser"); // 현재 로그인된 사용자의 ID
-        List<Item> itemList = itemService.getItemsByUserId(userId);
-        model.addAttribute("itemList", itemList);
+        String userId = (String) session.getAttribute("loggedInUser");
+        List<Map<String, Object>> groupedItems = itemService.getGroupedItemsByUserId(userId);
+        model.addAttribute("groupedItems", groupedItems);
         return "items/itemlist"; // itemlist.html 렌더링
     }
 

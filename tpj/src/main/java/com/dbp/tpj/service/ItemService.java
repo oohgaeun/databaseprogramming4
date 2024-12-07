@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
@@ -22,6 +24,36 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<Item> getItemsByUserId(String userId) {
         return itemRepository.findByUserId(userId);
+    }
+
+    //특정 사용자가 등록한 물품 중복회피 조회
+    public List<Map<String, Object>> getGroupedItemsByUserId(String userId) {
+        List<Object[]> groupedItems = itemRepository.findGroupedItemsByUserId(userId);
+        // Stream API를 활용
+        return groupedItems.stream()
+                .map(row -> Map.of(
+                        "itemName", row[0],
+                        "category", row[1],
+                        "count", row[2]
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // 특정 사용자의 물품 수량 계산
+    public Map<String, Long> getItemCounts(String userId) {
+        // 쿼리 결과: Object[] 형태의 itemName과 count 값
+        List<Object[]> itemCounts = itemRepository.findItemCountsByUserId(userId);
+
+        itemCounts.forEach(row -> {
+            System.out.println("Item Name: " + row[0] + ", Count: " + row[1]);
+        });
+
+        // itemName을 키로, count를 값으로 Map으로 변환
+        return itemCounts.stream()
+                .collect(Collectors.toMap(
+                        obj -> (String) obj[0],  // itemName
+                        obj -> (Long) obj[1]    // count
+                ));
     }
 
     // 물품 등록
