@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpSession;
 
 import java.security.Principal;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class ItemController {
 
     // 물품 목록 조회
     @GetMapping("/list")
-    public String getItemList(Model model, Principal principal) {
-        String userId = principal.getName(); // 현재 로그인된 사용자의 ID
+    public String getItemList(Model model, HttpSession session) {
+        String userId = (String) session.getAttribute("loggedInUser"); // 현재 로그인된 사용자의 ID
         List<Item> itemList = itemService.getItemsByUserId(userId);
         model.addAttribute("itemList", itemList);
         return "items/itemlist"; // itemlist.html 렌더링
@@ -39,8 +40,8 @@ public class ItemController {
 
     // 물품 등록 처리
     @PostMapping("/register")
-    public String registerItem(@ModelAttribute Item item, @RequestParam("quantity") int quantity, Principal principal) {
-        String userId = principal.getName(); // 현재 로그인된 사용자의 ID
+    public String registerItem(@ModelAttribute Item item, @RequestParam("quantity") int quantity, HttpSession session) {
+        String userId = (String) session.getAttribute("loggedInUser"); // 세션에서 사용자 ID 가져오기
         item.setStudent(new Student(userId)); // 사용자 ID를 기반으로 등록자 설정
 
         // 물품 등록 서비스 호출
@@ -51,8 +52,8 @@ public class ItemController {
 
     @PostMapping("/update")
     public String updateItemQuantity(@RequestParam String itemName, @RequestParam String category,
-                                     @RequestParam int quantity, Principal principal, RedirectAttributes redirectAttributes) {
-        String userId = principal.getName();
+                                     @RequestParam int quantity, HttpSession session, RedirectAttributes redirectAttributes) {
+        String userId = (String) session.getAttribute("loggedInUser"); // 세션에서 사용자 ID 가져오기
 
         boolean success = itemService.updateItemQuantity(userId, itemName, category, quantity);
 

@@ -6,12 +6,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "items")
 public class Item {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq_generator")
+    @SequenceGenerator(
+            name = "item_seq_generator",
+            sequenceName = "item_ID_seq", // 데이터베이스의 시퀀스 이름
+            allocationSize = 2            // 한 번에 증가하는 값
+    )
     @Column(name = "ItemID") // Primary Key
     private Long itemId; // 물품 ID (String -> Long 변경, 아래 동일(테이블에 number로 정의되어 있음)
 

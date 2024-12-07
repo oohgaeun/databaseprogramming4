@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
     // 특정 사용자가 등록한 물품 조회
-    @Query("SELECT i FROM Item i WHERE i.userId = :userId")
+    @Query("SELECT i FROM Item i WHERE i.student.id = :userId")
     List<Item> findByUserId(String userId);
 
     // 특정 물품 삭제
