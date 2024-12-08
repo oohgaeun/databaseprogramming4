@@ -13,6 +13,10 @@
 <body>
 <div class="container mt-4">
     <h1>로그인</h1>
+
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
+    </div>
     <form th:action="@{/login}" method="post">
         <div class="mb-3">
             <label for="id" class="form-label">학번</label>
@@ -22,7 +26,6 @@
             <label for="password" class="form-label">비밀번호</label>
             <input type="password" id="password" name="password" class="form-control" required />
         </div>
-        <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
         <button type="submit" class="btn btn-primary">로그인</button>
     </form>
 </div>

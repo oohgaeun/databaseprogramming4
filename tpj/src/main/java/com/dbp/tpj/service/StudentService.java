@@ -37,4 +37,10 @@ public class StudentService {
                 .map(Student::getName) // Student 객체의 이름 가져오기
                 .orElse("Unknown User");
     }
+
+    public Student getStudentById(String id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 학생 정보를 찾을 수 없습니다: " + id));
+    }
+
 }

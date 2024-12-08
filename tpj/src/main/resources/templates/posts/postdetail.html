@@ -12,7 +12,15 @@
 <body>
 <div class="container mt-4">
   <h1 class="mb-4">게시글 상세</h1>
+  <!-- 오류 메시지 표시 -->
+  <div th:if="${errorMessage}" class="alert alert-danger">
+    <span th:text="${errorMessage}"></span>
+  </div>
 
+  <!-- 성공 메시지 표시 -->
+  <div th:if="${successMessage}" class="alert alert-success">
+    <span th:text="${successMessage}"></span>
+  </div>
   <!-- 게시물 정보 -->
   <div class="card">
     <div class="card-header">
@@ -35,10 +43,19 @@
       <ul class="list-group">
         <li class="list-group-item" th:each="chat : ${chats}">
           <p><strong th:text="${chat.student.name}"></strong>님</p>
-          <p th:text="${chat.chatContents}"></p>
-          <small class="text-muted" th:text="${chat.permissionState}"></small>
+          <p th:text="${chat.content}"></p>
+          <small class="text-muted" th:text="${chat.status}"></small>
         </li>
       </ul>
+
+      <hr />
+      <h5>댓글 작성</h5>
+      <form th:action="@{/posts/{id}/comments(id=${post.postId})}" method="post">
+        <div class="form-group">
+          <textarea name="content" class="form-control" rows="3" placeholder="댓글 내용을 입력하세요"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">댓글 작성</button>
+      </form>
     </div>
   </div>
 
