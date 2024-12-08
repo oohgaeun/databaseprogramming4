@@ -32,4 +32,15 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                                                   @Param("itemName") String itemName,
                                                   @Param("category") String category);
 
+    @Query("SELECT COUNT(i) FROM Item i WHERE i.id = :itemId AND i.rentalState = '대여중'")
+    int countRentedItems(@Param("itemId") Long itemId);
+
+    @Query("SELECT CASE WHEN i.rentalState = '대여중' THEN true ELSE false END FROM Item i WHERE i.itemId = :itemId")
+    boolean isItemRented(@Param("itemId") Long itemId);
+
+    @Query("SELECT i FROM Item i WHERE i.itemName = :itemName AND i.student.id = :userId")
+    List<Item> findByItemNameAndUserId(@Param("itemName") String itemName, @Param("userId") String userId);
+
+
+
 }

@@ -10,52 +10,108 @@
   <title>등록한 물품 목록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <script>
-    let changes = {}; // 변경사항을 저장할 객체
+    function updateQuantity(button) {
+    const itemName = button.getAttribute('data-item-name');
+    const operation = button.getAttribute('data-operation');
+    const quantityInput = document.getElementById(`quantity-input-${itemName}`);
+    let currentQuantity = parseInt(quantityInput.value, 10);
 
-    function increaseQuantity(button) {
-        const itemId = button.getAttribute('data-item-id'); // 데이터 식별자 가져오기
-        const quantityElement = document.getElementById(`quantity-${itemId}`); // 수량 표시 엘리먼트
-        let currentQuantity = parseInt(quantityElement.textContent); // 현재 수량
-        quantityElement.textContent = ++currentQuantity; // 수량 증가
-        document.getElementById(`hiddenQuantity-${itemId}`).value = currentQuantity; // 숨겨진 input 업데이트
-        changes[itemId] = currentQuantity; // 변경사항 저장
+    if (operation === 'increase') {
+        currentQuantity++;
+    } else if (operation === 'decrease' && currentQuantity > 1) {
+        currentQuantity--;
     }
 
-    function decreaseQuantity(button) {
-        const itemId = button.getAttribute('data-item-id'); // 데이터 식별자 가져오기
-        const quantityElement = document.getElementById(`quantity-${itemId}`); // 수량 표시 엘리먼트
-        let currentQuantity = parseInt(quantityElement.textContent); // 현재 수량
-        if (currentQuantity > 1) {
-            quantityElement.textContent = --currentQuantity; // 수량 감소
-            document.getElementById(`hiddenQuantity-${itemId}`).value = currentQuantity; // 숨겨진 input 업데이트
-            changes[itemId] = currentQuantity; // 변경사항 저장
-        }
-    }
+    quantityInput.value = currentQuantity;
+}
 
+function markForDeletion(button) {
+    const itemName = button.getAttribute('data-item-name');
+    const deleteInput = document.getElementById(`delete-input-${itemName}`);
+    const quantityInput = document.getElementById(`quantity-input-${itemName}`);
+    const increaseButton = document.querySelector(`button[data-item-name="${itemName}"][data-operation="increase"]`);
+    const decreaseButton = document.querySelector(`button[data-item-name="${itemName}"][data-operation="decrease"]`);
+
+    if (deleteInput.value === 'false') {
+        deleteInput.value = 'true';
+        button.textContent = '삭제 취소';
+        quantityInput.disabled = true;
+        increaseButton.disabled = true;
+        decreaseButton.disabled = true;
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-secondary');
+    } else {
+        deleteInput.value = 'false';
+        button.textContent = '삭제';
+        quantityInput.disabled = false;
+        increaseButton.disabled = false;
+        decreaseButton.disabled = false;
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-danger');
+    }
+}
     function applyChanges() {
-        fetch('/items/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(changes) // 변경사항을 서버로 전송
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                alert('수정이 완료되었습니다.');
-                location.reload(); // 페이지 새로고침
-            } else {
-                alert('수정 실패: ' + result.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+    // 확인 메시지
+    const userConfirmed = confirm("정말로 수정하시겠습니까?");
+    if (!userConfirmed) {
+        // 사용자가 취소한 경우 실행 중지
+        return;
     }
+    const updates = [];
+    const deletions = [];
+
+    // 수정 데이터 수집
+    document.querySelectorAll('input[name^="quantities"]').forEach(input => {
+      const itemName = input.getAttribute('data-item-name');
+      const quantity = parseInt(input.value, 10);
+      if (itemName) {
+            updates.push({ itemName, quantity });
+        }
+    });
+
+    // 삭제 데이터 수집
+    document.querySelectorAll('input[name^="deletions"]').forEach(input => {
+      const itemName = input.getAttribute('data-item-name');
+      const isDeleted = input.value === 'true';
+      if (isDeleted) {
+        deletions.push(itemName);
+      }
+    });
+
+    console.log("Updates to send:", updates);
+    console.log("Deletions to send:", deletions);
+
+    // JSON 데이터 생성
+    const requestData = { updates, deletions };
+
+    // JSON 데이터 전송
+    fetch('/items/applyChanges', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData),
+    })
+      .then(response => response.json()) // JSON 응답 처리
+      .then(data => {
+        if (data.success) {
+            alert(data.message); // 성공 메시지 알림
+            window.location.href = data.redirectUrl; // 리다이렉트
+        } else {
+            alert("수정 실패: " + data.errorMessage); // 오류 메시지 알림
+        }
+    })
+    .catch(error => {
+        console.error("오류:", error);
+        alert("수정 작업 중 오류가 발생했습니다."); // 일반 오류 처리
+    });
+  }
   </script>
 </head>
 <body>
+
 <div class="container mt-5">
   <h1 class="mb-4">등록한 물품 목록</h1>
   <!-- 수정 적용을 위한 폼 -->
-  <form action="/items/update" method="post">
+  <form action="/items/applyChanges" method="post">
 
   <!-- 물품 목록 테이블 -->
   <table class="table table-bordered text-center">
@@ -69,28 +125,48 @@
     </thead>
     <tbody>
     <tr th:each="item : ${groupedItems}">
-      <td th:text="${item['itemName']}">물품명</td>
+      <!-- 물품명 -->
+      <td th:text="${item['itemName']}" th:attr="data-item-name=${item['itemName']}">물품명</td>
+      <!-- 카테고리 -->
       <td th:text="${item['category']}">카테고리</td>
+      <!-- 수량 -->
+      <!-- 수량 -->
       <td>
         <div class="d-flex justify-content-center align-items-center">
           <!-- 감소 버튼 -->
           <button type="button"
                   class="btn btn-outline-secondary btn-sm me-2"
-                  data-item-id="${item.itemId}"
-                  onclick="decreaseQuantity(this)">-</button>
-          <!-- 수량 표시 -->
-          <span id="quantity-${item.itemId}" th:text="${item['count']}">0</span>
+                  th:attr="data-item-name=${item['itemName']}"
+                  data-operation="decrease"
+                  onclick="updateQuantity(this)">-</button>
+          <!-- 수량 입력 -->
+          <input type="number"
+                 class="form-control text-center"
+                 th:id="'quantity-input-' + ${item['itemName']}"
+                 th:name="'quantities[' + ${item['itemName']} + ']'"
+                 th:attr="data-item-name=${item['itemName']}"
+                 th:value="${item['count']}"
+                 min="1"
+                 readonly>
           <!-- 증가 버튼 -->
           <button type="button"
                   class="btn btn-outline-secondary btn-sm ms-2"
-                  data-item-id="${item.itemId}"
-                  onclick="increaseQuantity(this)">+</button>
-          <!-- 숨겨진 input (수정 적용 시 사용) -->
-          <input type="hidden" id="hiddenQuantity-${item.itemId}" th:value="${item['count']}">
+                  th:attr="data-item-name=${item['itemName']}"
+                  data-operation="increase"
+                  onclick="updateQuantity(this)">+</button>
         </div>
       </td>
+        <!-- 삭제 -->
       <td>
-        <a th:href="@{/items/delete/{id}(id=${item['itemName']})}" class="btn btn-danger btn-sm">삭제</a>
+        <button type="button"
+                class="btn btn-danger btn-sm"
+                onclick="markForDeletion(this)"
+                th:attr="data-item-name=${item['itemName']}">삭제</button>
+        <input type="hidden"
+               th:id="'delete-input-' + ${item['itemName']}"
+               th:name="'deletions[' + ${item['itemName']} + ']'"
+               th:attr="data-item-name=${item['itemName']}"
+               value="false">
       </td>
     </tr>
     </tbody>
@@ -100,7 +176,7 @@
   <div class="d-flex justify-content-between">
     <a href="/" class="btn btn-secondary">뒤로가기</a>
     <div>
-      <button type="submit" class="btn btn-success me-2">수정적용</button>
+      <button type="button" class="btn btn-success" onclick="applyChanges()">수정적용</button>
       <a href="/items/register" class="btn btn-primary">물품 등록</a>
     </div>
   </div>

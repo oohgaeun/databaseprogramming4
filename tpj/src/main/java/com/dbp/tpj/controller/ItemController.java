@@ -3,15 +3,19 @@ package com.dbp.tpj.controller;
 import com.dbp.tpj.domain.Student;
 import com.dbp.tpj.domain.Item;
 import com.dbp.tpj.service.ItemService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
-import java.security.Principal;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Controller
 @RequestMapping("/items")
@@ -49,19 +53,45 @@ public class ItemController {
 
         return "redirect:/items/list"; // 등록 후 물품 목록으로 리다이렉트
     }
+    //물품 수정/삭제
+    @PostMapping(value = "/applyChanges", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public  Map<String, Object> applyChanges(@RequestBody Map<String, Object> requestData, HttpSession session, Model model) {
+        String userId = (String) session.getAttribute("loggedInUser");
 
-    @PostMapping("/update")
-    public String updateItemQuantity(@RequestParam String itemName, @RequestParam String category,
-                                     @RequestParam int quantity, HttpSession session, RedirectAttributes redirectAttributes) {
-        String userId = (String) session.getAttribute("loggedInUser"); // 세션에서 사용자 ID 가져오기
+        // 응답 데이터를 담을 Map 생성
+        Map<String, Object> response = new HashMap<>();
 
-        boolean success = itemService.updateItemQuantity(userId, itemName, category, quantity);
-
-        if (!success) {
-            redirectAttributes.addFlashAttribute("errorMessage", "대여중인 아이템이 있어 수량을 줄일 수 없습니다.");
+        if (userId == null) {
+            response.put("success", false);
+            response.put("errorMessage", "로그인이 필요합니다.");
+            return response; // JSON 형태로 반환
         }
 
-        return "redirect:/items/list";
+        // JSON 데이터 파싱
+        List<Map<String, Object>> updates = (List<Map<String, Object>>) requestData.get("updates");
+        updates.forEach(update -> {
+            System.out.println("Update Entry: " + update); // 디버깅 출력
+        });
+        List<String> deletions = (List<String>) requestData.get("deletions");
+        //디버그
+        System.out.println("Request Data: " + requestData);
+        System.out.println("Updates: " + updates);
+        System.out.println("Deletions: " + deletions);
+
+        // 서비스 호출
+        List<String> errors = itemService.updateAndDeleteItems(userId, updates, deletions);
+
+        if (!errors.isEmpty()) {
+            response.put("success", false);
+            response.put("errorMessage", String.join(", ", errors));
+        } else {
+            response.put("success", true);
+            response.put("message", "수정 사항이 성공적으로 적용되었습니다.");
+            response.put("redirectUrl", "/items/list"); // 리다이렉트 URL 포함
+        }
+
+        return response; // Map을 JSON으로 변환하여 반환
     }
 
     // 물품 삭제

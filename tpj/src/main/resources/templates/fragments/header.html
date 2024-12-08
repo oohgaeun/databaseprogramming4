@@ -17,13 +17,13 @@
                 <a href="/signup">회원가입</a>
             </span>
         <span th:if="${session.loggedInUser != null}">
-                <!-- 물품 등록 버튼 추가 -->
-                <a href="/items/list" style="margin-left: 10px;">물품 등록</a>
                 <!-- 로그인 상태 -->
                 <span th:text=" ${session.loggedInUserName} + '님!'"></span>
-                <a href="/logout" style="margin-left: 10px;">로그아웃</a>
+                <!-- 물품 등록 버튼 추가 -->
+                <a href="/items/list" style="margin-left: 10px;">물품 등록</a>
                 <!-- 물품 기록 버튼 추가 (새로 추가한 부분)-->
                 <a href="/items/records">물품 기록</a>
+                <a href="/logout" style="margin-left: 10px;">로그아웃</a>
             </span>
     </div>
 </div>
