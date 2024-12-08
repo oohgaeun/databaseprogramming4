@@ -3,38 +3,39 @@ package com.dbp.tpj.domain;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "chats")
+@Table(name = "chats", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"post_id", "student_id"})
+})
 public class Chat {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ChatID")
-    private Long chatId; // 채팅 ID
+    @Column(name = "chat_id")
+    private Long chatId; // 댓글 ID (Primary Key)
 
-    @ManyToOne
-    @JoinColumn(name = "PostID", nullable = false) // 관련 게시물
-    private Post post;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", referencedColumnName = "PostID", nullable = false)
+    private Post post; // 게시물 (FK)
 
-    @ManyToOne
-    @JoinColumn(name = "ID", nullable = false) // 작성자
-    private Student student;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", referencedColumnName = "ID", nullable = false)
+    private Student student; // 작성자 (FK)
 
-    @Column(name = "Chat_contents", nullable = false, columnDefinition = "CLOB")
-    private String chatContents; // 채팅 내용
+    @Column(name = "content", nullable = false, columnDefinition = "CLOB")
+    private String content; // 댓글 내용
 
-    @Column(name = "Permission_state")
-    private String permissionState; // 승인 상태 ('대기', '승낙')
+    @Column(name = "status", nullable = true)
+    private String status; // 상태 ('대기', '승낙')
 
     // 기본 생성자
-    public Chat() {
-    }
+    public Chat() {}
 
-    // 모든 필드를 포함한 생성자
-    public Chat(Long chatId, Post post, Student student, String chatContents, String permissionState) {
+    // 모든 필드 포함 생성자
+    public Chat(Long chatId, Post post, Student student, String content, String status) {
         this.chatId = chatId;
         this.post = post;
         this.student = student;
-        this.chatContents = chatContents;
-        this.permissionState = permissionState;
+        this.content = content;
+        this.status = status;
     }
 
     // Getter와 Setter
@@ -62,20 +63,19 @@ public class Chat {
         this.student = student;
     }
 
-    public String getChatContents() {
-        return chatContents;
+    public String getContent() {
+        return content;
     }
 
-    public void setChatContents(String chatContents) {
-        this.chatContents = chatContents;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getPermissionState() {
-        return permissionState;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPermissionState(String permissionState) {
-        this.permissionState = permissionState;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
 }
