@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -37,6 +39,12 @@ public class PostController {
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size,
                             Model model) {
+        // '/posts'에 직접 접근한 경우 기본 필터 값으로 리다이렉트
+        if (search == null && rentalState == null && page == 0 && sortType.equals("creationDesc")) {
+            String encodedRentalState = URLEncoder.encode("전체", StandardCharsets.UTF_8);
+            return "redirect:/posts?page=0&search=&rentalState=" + encodedRentalState + "&sortType=creationDesc";
+        }
+
         Page<Post> postPage = postService.searchPosts(search, rentalState, sortType, page, size);
 
         // 검색 결과가 없을 때 처리
