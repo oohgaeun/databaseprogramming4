@@ -19,6 +19,17 @@ public class ChatService {
         this.chatRepository = chatRepository;
     }
 
+    // 특정 댓글 조회
+    public Chat getChatById(Long chatId) {
+        return chatRepository.findById(chatId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + chatId));
+    }
+
+    // 특정 댓글 삭제
+    public void deleteChat(Long chatId) {
+        chatRepository.deleteById(chatId);
+    }
+
     public List<Chat> getChatsByPost(Post post) {
         return chatRepository.findByPost(post);
     }

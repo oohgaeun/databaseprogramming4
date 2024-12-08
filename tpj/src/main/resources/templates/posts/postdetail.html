@@ -42,7 +42,18 @@
     <div class="card-body">
       <ul class="list-group">
         <li class="list-group-item" th:each="chat : ${chats}">
-          <p><strong th:text="${chat.student.name}"></strong>님</p>
+          <p>
+            <strong th:text="${chat.student.name}"></strong>님
+            <!-- 삭제 버튼: 현재 사용자와 댓글 작성자가 같을 경우에만 표시 -->
+          <form th:if="${chat.student.id == session.loggedInUser}"
+                th:action="@{/posts/{postId}/comments/{chatId}/delete(postId=${post.postId}, chatId=${chat.chatId})}"
+                method="post"
+                style="display: inline;">
+            <button type="submit" class="btn btn-danger btn-sm float-end" onclick="return confirm('정말 삭제하시겠습니까?')">
+              삭제
+            </button>
+          </form>
+          </p>
           <p th:text="${chat.content}"></p>
           <small class="text-muted" th:text="${chat.status}"></small>
         </li>

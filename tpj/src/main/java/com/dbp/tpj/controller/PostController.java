@@ -9,6 +9,7 @@ import com.dbp.tpj.service.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,17 +31,44 @@ public class PostController {
     }
 
     @GetMapping
-    public String listPosts(@RequestParam(defaultValue = "0") int page,
+    public String listPosts(@RequestParam(required = false) String search,
+                            @RequestParam(required = false) String rentalState,
+                            @RequestParam(required = false, defaultValue = "creationDesc") String sortType,
+                            @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size,
                             Model model) {
-        Pageable pageable = PageRequest.of(page, size); // 페이지 번호와 크기를 설정
-        Page<Post> postPage = postService.getPosts(pageable); // 페이징된 데이터 가져오기
+        Page<Post> postPage = postService.searchPosts(search, rentalState, sortType, page, size);
 
-        model.addAttribute("posts", postPage.getContent()); // 게시물 리스트
-        model.addAttribute("currentPage", postPage.getNumber()); // 현재 페이지
-        model.addAttribute("totalPages", postPage.getTotalPages()); // 총 페이지 수
+        // 검색 결과가 없을 때 처리
+        if (postPage.isEmpty() && page > 0) {
+            return "redirect:/posts?page=0&search=" + (search != null ? search : "") +
+                    "&rentalState=" + (rentalState != null ? rentalState : "전체") +
+                    "&sortType=" + sortType;
+        }
+
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", postPage.getNumber());
+        model.addAttribute("totalPages", postPage.getTotalPages());
+        model.addAttribute("isEmpty", postPage.isEmpty()); // 결과가 비었는지 전달
+        model.addAttribute("param", new SearchParams(search, rentalState, sortType));
 
         return "posts/postslist";
+    }
+
+    public static class SearchParams {
+        private String search;
+        private String rentalState;
+        private String sortType;
+
+        public SearchParams(String search, String rentalState, String sortType) {
+            this.search = search;
+            this.rentalState = rentalState;
+            this.sortType = sortType;
+        }
+
+        public String getSearch() { return search; }
+        public String getRentalState() { return rentalState; }
+        public String getSortType() { return sortType; }
     }
 
     @GetMapping("/{id}")
@@ -94,5 +122,29 @@ public class PostController {
         return "redirect:/posts/" + id;
     }
 
+    @PostMapping("/{postId}/comments/{chatId}/delete")
+    public String deleteComment(@PathVariable Long postId,
+                                @PathVariable Long chatId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        String studentId = (String) session.getAttribute("loggedInUser");
+
+        if (studentId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        Chat chat = chatService.getChatById(chatId);
+
+        if (!chat.getStudent().getId().equals(studentId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "본인이 작성한 댓글만 삭제할 수 있습니다.");
+            return "redirect:/posts/" + postId;
+        }
+
+        chatService.deleteChat(chatId);
+
+        redirectAttributes.addFlashAttribute("successMessage", "댓글이 삭제되었습니다.");
+        return "redirect:/posts/" + postId;
+    }
 
 }
