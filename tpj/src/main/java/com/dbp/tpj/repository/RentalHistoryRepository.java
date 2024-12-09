@@ -19,5 +19,5 @@ public interface RentalHistoryRepository extends JpaRepository<RentalHistory, St
     List<RentalHistory> findByReturnStatus(String returnStatus);
 
     // 특정 물품(ItemID)으로 기록 조회
-    List<RentalHistory> findByItem_ItemId(Long  itemId);
+    List<RentalHistory> findByItem_ItemId(String  itemId);
 }

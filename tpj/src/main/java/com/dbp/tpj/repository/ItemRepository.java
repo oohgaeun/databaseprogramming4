@@ -23,20 +23,12 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i.itemName, COUNT(i) FROM Item i WHERE i.student.id = :userId GROUP BY i.itemName")
     List<Object[]> findItemCountsByUserId(@Param("userId") String userId);
 
-    // 특정 물품 삭제
-    void deleteById(Long itemId);
 
     // 특정 사용자의 물품 중 이름으로 검색 (옵션)
     @Query("SELECT i FROM Item i WHERE i.student.id = :userId AND i.itemName = :itemName AND i.category = :category")
     List<Item> findByUserIdAndItemNameAndCategory(@Param("userId") String userId,
                                                   @Param("itemName") String itemName,
                                                   @Param("category") String category);
-
-    @Query("SELECT COUNT(i) FROM Item i WHERE i.id = :itemId AND i.rentalState = '대여중'")
-    int countRentedItems(@Param("itemId") Long itemId);
-
-    @Query("SELECT CASE WHEN i.rentalState = '대여중' THEN true ELSE false END FROM Item i WHERE i.itemId = :itemId")
-    boolean isItemRented(@Param("itemId") Long itemId);
 
     @Query("SELECT i FROM Item i WHERE i.itemName = :itemName AND i.student.id = :userId")
     List<Item> findByItemNameAndUserId(@Param("itemName") String itemName, @Param("userId") String userId);

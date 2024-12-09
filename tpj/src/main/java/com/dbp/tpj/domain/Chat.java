@@ -9,15 +9,15 @@ import jakarta.persistence.*;
 public class Chat {
 
     @Id
-    @Column(name = "chat_id")
+    @Column(name = "chatid")
     private Long chatId; // 댓글 ID (Primary Key)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", referencedColumnName = "PostID", nullable = false)
+    @JoinColumn(name = "postid", referencedColumnName = "PostID", nullable = false)
     private Post post; // 게시물 (FK)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", referencedColumnName = "ID", nullable = false)
+    @JoinColumn(name = "studentid", referencedColumnName = "ID", nullable = false)
     private Student student; // 작성자 (FK)
 
     @Column(name = "content", nullable = false, columnDefinition = "CLOB")

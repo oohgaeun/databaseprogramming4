@@ -93,11 +93,4 @@ public class ItemController {
 
         return response; // Map을 JSON으로 변환하여 반환
     }
-
-    // 물품 삭제
-    @GetMapping("/delete/{id}")
-    public String deleteItem(@PathVariable Long id) {
-        itemService.deleteItem(id);
-        return "redirect:/items/list"; // 삭제 후 물품 목록으로 리다이렉트
-    }
 }

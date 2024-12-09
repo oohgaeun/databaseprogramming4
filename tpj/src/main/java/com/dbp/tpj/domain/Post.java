@@ -27,10 +27,6 @@ public class Post {
     private LocalDateTime creationDay; // 작성 일자
 
     @ManyToOne
-    @JoinColumn(name = "ItemID", nullable = false) // 대여 대상 물품
-    private Item item;
-
-    @ManyToOne
     @JoinColumn(name = "ID", nullable = false) // 작성자
     private Student student;
 
@@ -39,14 +35,13 @@ public class Post {
     }
 
     // 모든 필드를 포함한 생성자
-    public Post(Long postId, String rentalState, String title, String postContents, Integer interestCount, LocalDateTime creationDay, Item item, Student student) {
+    public Post(Long postId, String rentalState, String title, String postContents, Integer interestCount, LocalDateTime creationDay, Student student) {
         this.postId = postId;
         this.rentalState = rentalState;
         this.title = title;
         this.postContents = postContents;
         this.interestCount = interestCount;
         this.creationDay = creationDay;
-        this.item = item;
         this.student = student;
     }
 
@@ -97,14 +92,6 @@ public class Post {
 
     public void setCreationDay(LocalDateTime creationDay) {
         this.creationDay = creationDay;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
     }
 
     public Student getStudent() {

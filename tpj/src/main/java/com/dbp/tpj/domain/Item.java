@@ -15,14 +15,9 @@ import java.time.LocalDateTime;
 @Table(name = "items")
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq_generator")
-    @SequenceGenerator(
-            name = "item_seq_generator",
-            sequenceName = "item_ID_seq", // 데이터베이스의 시퀀스 이름
-            allocationSize = 2            // 한 번에 증가하는 값
-    )
-    @Column(name = "ItemID") // Primary Key
-    private Long itemId; // 물품 ID (String -> Long 변경, 아래 동일(테이블에 number로 정의되어 있음)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ItemID")
+    private String itemId;// 물품 ID
 
     @Column(name = "Itemname", nullable = false)
     private String itemName; // 물품명
@@ -45,7 +40,7 @@ public class Item {
     }
 
     // 모든 필드를 포함한 생성자
-    public Item(Long itemId, String itemName, String category, String rentalState, LocalDateTime returnDay, Student student) {
+    public Item(String itemId, String itemName, String category, String rentalState, LocalDateTime returnDay, Student student) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.category = category;
@@ -55,11 +50,11 @@ public class Item {
     }
 
     // Getter와 Setter
-    public Long getItemId() {
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(Long itemId) {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 
