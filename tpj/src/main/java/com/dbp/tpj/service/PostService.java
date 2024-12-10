@@ -1,7 +1,9 @@
 package com.dbp.tpj.service;
 
+import com.dbp.tpj.domain.Item;
 import com.dbp.tpj.domain.Post;
 import com.dbp.tpj.repository.PostRepository;
+import com.dbp.tpj.repository.RentalRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +15,11 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final RentalRepository rentalRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, RentalRepository rentalRepository) {
         this.postRepository = postRepository;
+        this.rentalRepository = rentalRepository;
     }
 
     // 모든 게시물 조회
@@ -63,6 +67,11 @@ public class PostService {
     // 게시물 삭제
     public void deletePost(Long postId) {
         postRepository.deleteById(postId);
+    }
+
+    public List<Item> getItemsByPostId(Long postId) {
+        // rental 테이블에서 PostID로 Item 정보를 가져오는 로직
+        return rentalRepository.findItemsByPostId(postId);
     }
 
 }

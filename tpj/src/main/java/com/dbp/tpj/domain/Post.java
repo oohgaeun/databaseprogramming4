@@ -20,15 +20,15 @@ public class Post {
     @Column(name = "Post_contents", nullable = false, columnDefinition = "CLOB")
     private String postContents; // 게시물 내용
 
-    @Column(name = "Interestcount", columnDefinition = "NUMBER DEFAULT 0")
-    private Integer interestCount; // 관심 수
+    @Column(name = "Interestcount")
+    private Integer interestCount = 0;
 
     @Column(name = "Creationday", nullable = false)
     private LocalDateTime creationDay; // 작성 일자
 
     @ManyToOne
-    @JoinColumn(name = "ID", nullable = false) // 작성자
-    private Student student;
+    @JoinColumn(name = "StudentID", nullable = false)
+    private Student student;  // 작성자
 
     // 기본 생성자
     public Post() {

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Pattern;
 @Table(name = "students")
 public class Student {
     @Id
-    @Column(name = "ID")
+    @Column(name = "StudentID")
     private String id;
 
     @Column(name = "PW", nullable = false)
@@ -23,11 +23,11 @@ public class Student {
     @Pattern(regexp = "010-\\d{4}-\\d{4}", message = "전화번호는 010-1234-5678 형식이어야 합니다.")
     private String phoneNumber;
 
-    @Column(name = "Credit", columnDefinition = "NUMBER DEFAULT 100")
-    private Integer credit;
+    @Column(name = "Credit")
+    private Integer credit = 10;
 
-    @Column(name = "RTcount", columnDefinition = "NUMBER DEFAULT 0")
-    private Integer rtCount;
+    @Column(name = "RTcount")
+    private Integer rtCount = 0;
 
 
     // 기본 생성자
@@ -40,8 +40,8 @@ public class Student {
         this.password = password;
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.credit = credit;
-        this.rtCount = rtCount;
+        this.credit = 10;
+        this.rtCount = 0;
     }
 
     // ID만 초기화하는 생성자(물품 등록에 사용, 이외 학번만 가져갈때 사용할 수 있을 듯)

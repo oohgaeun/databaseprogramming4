@@ -1,10 +1,9 @@
 package com.dbp.tpj.controller;
 
-import com.dbp.tpj.domain.Chat;
-import com.dbp.tpj.domain.Post;
-import com.dbp.tpj.domain.Student;
+import com.dbp.tpj.domain.*;
 import com.dbp.tpj.service.ChatService;
 import com.dbp.tpj.service.PostService;
+import com.dbp.tpj.service.RentalService;
 import com.dbp.tpj.service.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,10 +25,12 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final ChatService chatService;
+    private final RentalService rentalService;
 
-    public PostController(PostService postService, ChatService chatService) {
+    public PostController(PostService postService, ChatService chatService, RentalService rentalService) {
         this.postService = postService;
         this.chatService = chatService;
+        this.rentalService = rentalService;
     }
 
     @GetMapping
@@ -83,11 +84,13 @@ public class PostController {
     public String viewPost(@PathVariable Long id,
                            @RequestParam(value = "errorMessage", required = false) String errorMessage,
                            Model model) {
-        Post post = postService.getPostById(id);
-        List<Chat> chats = chatService.getChatsByPost(post);
+        Post post = postService.getPostById(id); // 게시물 정보
+        List<Chat> chats = chatService.getChatsByPost(post); // 댓글 정보
+        List<Item> items = postService.getItemsByPostId(id); // 연동된 상품 정보
 
         model.addAttribute("post", post);
         model.addAttribute("chats", chats);
+        model.addAttribute("items", items);
 
         // 오류 메시지
         if (errorMessage != null) {
@@ -96,6 +99,7 @@ public class PostController {
 
         return "posts/postdetail";
     }
+
 
 
     @PostMapping("/{id}/comments")

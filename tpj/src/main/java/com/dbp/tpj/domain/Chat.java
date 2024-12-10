@@ -13,17 +13,18 @@ public class Chat {
     private Long chatId; // 댓글 ID (Primary Key)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postid", referencedColumnName = "PostID", nullable = false)
+    @JoinColumn(name = "PostID", referencedColumnName = "PostID", nullable = false)
     private Post post; // 게시물 (FK)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studentid", referencedColumnName = "ID", nullable = false)
+    @JoinColumn(name = "StudentID", referencedColumnName = "StudentID", nullable = false)
     private Student student; // 작성자 (FK)
 
-    @Column(name = "content", nullable = false, columnDefinition = "CLOB")
+    @Lob
+    @Column(name = "Chat_contents", nullable = false)
     private String content; // 댓글 내용
 
-    @Column(name = "status", nullable = true)
+    @Column(name = "Permission_state", nullable = true)
     private String status; // 상태 ('대기', '승낙')
 
     // 기본 생성자

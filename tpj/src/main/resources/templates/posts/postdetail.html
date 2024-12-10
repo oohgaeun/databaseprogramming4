@@ -27,7 +27,7 @@
       <h3 th:text="${post.title}"></h3>
     </div>
     <div class="card-body">
-      <p><strong>작성자:</strong> <span th:text="${post.student.name}"></span></p>
+      <p><strong>작성자:</strong> <span th:text="${post.student?.name}"></span></p>
       <p><strong>작성 일자:</strong> <span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd').format(post.creationDay)}"></span></p>
       <p><strong>대여 상태:</strong> <span th:text="${post.rentalState}"></span></p>
       <hr />
@@ -35,7 +35,20 @@
       <p th:text="${post.postContents}"></p>
     </div>
   </div>
-
+  <!-- 상품 정보 섹션 -->
+  <div class="card mt-3">
+    <div class="card-header">상품 정보</div>
+    <div class="card-body">
+      <ul class="list-group">
+        <li class="list-group-item" th:each="item : ${items}">
+          <p><strong>상품명:</strong> <span th:text="${item.itemName}"></span></p>
+          <p><strong>카테고리:</strong> <span th:text="${item.category}"></span></p>
+          <p><strong>대여 상태:</strong> <span th:text="${item.rentalState}"></span></p>
+          </p>
+        </li>
+      </ul>
+    </div>
+  </div>
   <!-- 댓글 섹션 -->
   <div class="card">
     <div class="card-header">댓글</div>
@@ -43,7 +56,7 @@
       <ul class="list-group">
         <li class="list-group-item" th:each="chat : ${chats}">
           <p>
-            <strong th:text="${chat.student.name}"></strong>님
+            <strong th:text="${chat.student?.name}"></strong>님
             <!-- 삭제 버튼: 현재 사용자와 댓글 작성자가 같을 경우에만 표시 -->
           <form th:if="${chat.student.id == session.loggedInUser}"
                 th:action="@{/posts/{postId}/comments/{chatId}/delete(postId=${post.postId}, chatId=${chat.chatId})}"
