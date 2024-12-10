@@ -26,7 +26,7 @@ public class Post {
     private LocalDateTime creationDay; // 작성 일자
 
     @ManyToOne
-    @JoinColumn(name = "StudentID", nullable = false)
+    @JoinColumn(name = "ID", nullable = false)  // 여기도 잠시 ID로 바꿉니다. 나중에 StudentID로 변경
     private Student student;  // 작성자
 
     // 기본 생성자

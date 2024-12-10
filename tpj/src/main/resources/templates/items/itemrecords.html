@@ -70,15 +70,25 @@
                 <th>대여 종료일</th>
                 <th>대여 해준 사람</th>
                 <th>반납 상태</th>
+                <th>작업</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="record : ${borrowedRecords}">
-                <td th:text="${record.itemName}"></td>
+                <td th:text="${record.item.itemName}"></td>
                 <td th:text="${#dates.format(record.rentStart, 'yyyy-MM-dd')}"></td>
                 <td th:text="${#dates.format(record.rentEnd, 'yyyy-MM-dd') ?: '진행 중'}"></td>
-                <td th:text="${record.lenderName}"></td>
+                <td th:text="${record.lender.name}"></td>
                 <td th:text="${record.returnStatus}"></td>
+                <td>
+                    <!-- 반납 버튼 -->
+                    <form th:if="${record.borrower.id == session.loggedInUser}"
+                          th:action="@{/items/records/{rentalId}/return(rentalId=${record.historyId})}"
+                          method="post"
+                          style="display: inline;">
+                        <button type="submit" class="btn btn-danger">반납</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>

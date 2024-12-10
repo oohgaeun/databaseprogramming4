@@ -4,7 +4,9 @@ package com.dbp.tpj.repository;
 import com.dbp.tpj.domain.Post;
 import com.dbp.tpj.domain.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.dbp.tpj.domain.Chat;
 
@@ -22,4 +24,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT MAX(c.chatId) FROM Chat c")
     Optional<Long> findMaxChatId();
+
+    //댓글 상태 업데이트
+    @Modifying
+    @Query("UPDATE Chat c SET c.status = '승낙' WHERE c.chatId = :chatId")
+    void updateChatStatusToAccepted(@Param("chatId") Long chatId);
 }

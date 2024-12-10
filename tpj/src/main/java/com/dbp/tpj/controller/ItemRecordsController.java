@@ -5,10 +5,12 @@ import com.dbp.tpj.service.RentalHistoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal; // Spring Security 사용 시 필요
 
 @Controller
+@RequestMapping("/items")
 public class ItemRecordsController {
 
     private final RentalHistoryService rentalHistoryService;
@@ -17,7 +19,7 @@ public class ItemRecordsController {
         this.rentalHistoryService = rentalHistoryService;
     }
 
-    @GetMapping("/items/records")
+    @GetMapping("/records")
     public String getItemRecords(Model model, Principal principal) {
         //사용자 ID가 Null이면(오류이면)
         if (principal == null) {

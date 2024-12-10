@@ -32,7 +32,7 @@ public class Item {
     private LocalDateTime returnDay; // 반납 기한
 
     @ManyToOne
-    @JoinColumn(name = "StudentID", nullable = false) // 등록자
+    @JoinColumn(name = "ID", nullable = false) // 등록자 <- 여기도 StudentID
     private Student student;
 
     // 기본 생성자

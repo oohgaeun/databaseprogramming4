@@ -212,4 +212,36 @@ public class PostController {
         return "redirect:/posts/" + postId;
     }
 
+    @PostMapping("/{postId}/comments/{chatId}/accept")
+    public String acceptRental(@PathVariable Long postId,
+                               @PathVariable Long chatId,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        String studentId = (String) session.getAttribute("loggedInUser");
+
+        // 로그인 여부 확인
+        if (studentId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        // 게시글 작성자인지 확인
+        Post post = postService.getPostById(postId);
+        if (!post.getStudent().getId().equals(studentId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "작성자만 대여를 승인할 수 있습니다.");
+            return "redirect:/posts/" + postId;
+        }
+
+        // 댓글 상태를 "승낙"으로 변경
+        Chat chat = chatService.getChatById(chatId);
+        chat.setStatus("승낙"); // 여기서 필드 이름 수정
+        chatService.saveChat(chat);
+
+        // 대여 프로세스 처리
+        rentalService.approveRental(postId);
+
+        redirectAttributes.addFlashAttribute("successMessage", "대여가 승인되었습니다.");
+        return "redirect:/posts/" + postId;
+    }
+
 }

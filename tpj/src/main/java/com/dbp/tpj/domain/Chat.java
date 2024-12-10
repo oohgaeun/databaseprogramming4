@@ -17,7 +17,7 @@ public class Chat {
     private Post post; // 게시물 (FK)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "StudentID", referencedColumnName = "StudentID", nullable = false)
+    @JoinColumn(name = "ID", referencedColumnName = "ID", nullable = false) // <- 여기도 나중에 StudentID
     private Student student; // 작성자 (FK)
 
     @Lob
