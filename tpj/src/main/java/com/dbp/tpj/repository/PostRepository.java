@@ -17,4 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 제목 또는 내용 + 대여 상태 검색
     @Query("SELECT p FROM Post p WHERE (:search IS NULL OR p.title LIKE %:search% OR p.postContents LIKE %:search%) AND p.rentalState = :rentalState")
     Page<Post> searchByTitleOrContentAndRentalState(@Param("search") String search, @Param("rentalState") String rentalState, Pageable pageable);
+
+    @Query("SELECT COALESCE(MAX(p.postId), 0) + 1 FROM Post p")
+    Long getNextPostId();
+
 }

@@ -1,10 +1,7 @@
 package com.dbp.tpj.controller;
 
 import com.dbp.tpj.domain.*;
-import com.dbp.tpj.service.ChatService;
-import com.dbp.tpj.service.PostService;
-import com.dbp.tpj.service.RentalService;
-import com.dbp.tpj.service.StudentService;
+import com.dbp.tpj.service.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/posts")
@@ -26,11 +24,13 @@ public class PostController {
     private final PostService postService;
     private final ChatService chatService;
     private final RentalService rentalService;
+    private final ItemService itemService;
 
-    public PostController(PostService postService, ChatService chatService, RentalService rentalService) {
+    public PostController(PostService postService, ChatService chatService, RentalService rentalService, ItemService itemService) {
         this.postService = postService;
         this.chatService = chatService;
         this.rentalService = rentalService;
+        this.itemService = itemService;
     }
 
     @GetMapping
@@ -99,6 +99,59 @@ public class PostController {
 
         return "posts/postdetail";
     }
+
+
+
+    @GetMapping("/create")
+    public String showCreatePostPage(HttpSession session, Model model) {
+        String studentId = (String) session.getAttribute("loggedInUser");
+        if (studentId == null) {
+            return "redirect:/login"; // 로그인되지 않은 경우 로그인 화면으로 이동
+        }
+
+        // 그룹화된 사용 가능한 아이템 가져오기
+        List<Map<String, Object>> groupedItems = itemService.getGroupedAvailableItemsByUserId(studentId);
+        model.addAttribute("groupedItems", groupedItems);
+
+        return "posts/postcreate";
+    }
+
+    @PostMapping("/create")
+    public String createPost(@RequestParam String title,
+                             @RequestParam String content,
+                             @RequestParam String itemName,
+                             @RequestParam int quantity,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+        String studentId = (String) session.getAttribute("loggedInUser");
+        if (studentId == null) {
+            return "redirect:/login";
+        }
+
+        // 사용 가능한 상품 조회
+        List<Item> availableItems = itemService.getAvailableItemsByStudentId(studentId);
+        List<Item> selectedItems = availableItems.stream()
+                .filter(item -> item.getItemName().equals(itemName))
+                .limit(quantity)
+                .toList();
+
+        if (selectedItems.size() < quantity) {
+            redirectAttributes.addFlashAttribute("errorMessage", "등록 가능한 상품 개수보다 많습니다.");
+            return "redirect:/posts/create";
+        }
+
+        // 게시글 저장
+        Post post = postService.createPost(title, content, studentId);
+
+        // Rental 테이블에 상품 등록
+        rentalService.linkItemsToPost(selectedItems, post);
+
+        redirectAttributes.addFlashAttribute("successMessage", "게시글이 성공적으로 작성되었습니다.");
+        return "redirect:/posts";
+    }
+
+
+
 
 
 

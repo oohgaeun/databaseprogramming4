@@ -2,6 +2,7 @@ package com.dbp.tpj.service;
 
 import com.dbp.tpj.domain.Item;
 import com.dbp.tpj.domain.Post;
+import com.dbp.tpj.domain.Student;
 import com.dbp.tpj.repository.PostRepository;
 import com.dbp.tpj.repository.RentalRepository;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -58,9 +60,18 @@ public class PostService {
         }
     }
 
+    public Post createPost(String title, String content, String studentId) {
+        Student student = new Student();
+        student.setId(studentId);
 
-    // 게시물 추가
-    public Post addPost(Post post) {
+        Post post = new Post();
+        post.setPostId(postRepository.getNextPostId());
+        post.setTitle(title);
+        post.setPostContents(content);
+        post.setRentalState("대여가능");
+        post.setCreationDay(LocalDateTime.now());
+        post.setStudent(student);
+
         return postRepository.save(post);
     }
 

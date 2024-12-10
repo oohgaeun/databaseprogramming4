@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 @Table(name = "posts")
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PostID")
     private Long postId; // 게시물 ID
 

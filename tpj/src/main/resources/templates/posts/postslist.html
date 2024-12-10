@@ -12,9 +12,10 @@
 </head>
 <body>
 <div class="container mt-4">
-    <h1>게시글 목록</h1>
-
-    <!-- 필터링 및 검색 -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>게시글 목록</h1>
+        <a href="/posts/create" class="btn btn-success">게시글 작성</a>
+    </div><!-- 필터링 및 검색 -->
     <form th:action="@{/posts}" method="get" class="mb-3">
         <div class="row">
             <div class="col-md-3">

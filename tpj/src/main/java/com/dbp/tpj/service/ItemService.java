@@ -1,24 +1,26 @@
 package com.dbp.tpj.service;
 
+import com.dbp.tpj.domain.Post;
+import com.dbp.tpj.domain.Rental;
 import com.dbp.tpj.domain.Student;
 import com.dbp.tpj.domain.Item;
 import com.dbp.tpj.repository.ItemRepository;
+import com.dbp.tpj.repository.RentalRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final RentalRepository rentalRepository;
 
-    public ItemService(ItemRepository itemRepository) {
+    public ItemService(ItemRepository itemRepository, RentalRepository rentalRepository) {
         this.itemRepository = itemRepository;
+        this.rentalRepository = rentalRepository;
     }
 
     //@Transactional이 붙으면, 데이터베이스의 일관성을 유지하기 위해 모든 작업이 트랜잭션으로 처리
@@ -32,7 +34,7 @@ public class ItemService {
     //특정 사용자가 등록한 물품 중복회피 조회
     public List<Map<String, Object>> getGroupedItemsByUserId(String userId) {
         List<Object[]> groupedItems = itemRepository.findGroupedItemsByUserId(userId);
-        // Stream API를 활용
+        // Map으로 변환
         return groupedItems.stream()
                 .map(row -> Map.of(
                         "itemName", row[0],
@@ -40,6 +42,55 @@ public class ItemService {
                         "count", row[2]
                 ))
                 .collect(Collectors.toList());
+    }
+
+
+    // 특정 학생이 등록한 물품 중 Rental 테이블에 등록되지 않은 상품만 반환 (추가된 함수)
+    public List<Map<String, Object>> getGroupedAvailableItemsByUserId(String studentId) {
+        // 학생이 등록한 전체 상품
+        List<Item> allItems = itemRepository.findByUserId(studentId);
+
+        // 이미 Rental 테이블에 등록된 상품 ID 가져오기
+        List<String> rentedItemIds = rentalRepository.findRentedItemIdsByStudentId(studentId);
+
+        // 사용 가능한 상품만 필터링
+        List<Item> availableItems = allItems.stream()
+                .filter(item -> !rentedItemIds.contains(item.getItemId()))
+                .collect(Collectors.toList()); // toList()로 변경
+
+        // 그룹화: itemName 기준으로 count 계산
+        Map<String, Long> groupedItems = availableItems.stream()
+                .collect(Collectors.groupingBy(
+                        Item::getItemName, // 그룹화 기준
+                        Collectors.counting() // 개수 계산
+                ));
+
+        // Map<String, Long>을 List<Map<String, Object>>로 변환
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : groupedItems.entrySet()) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("itemName", entry.getKey());
+            itemMap.put("count", entry.getValue());
+            result.add(itemMap);
+        }
+
+        return result;
+    }
+
+
+    // 특정 학생이 등록한 물품 중 rental 테이블에 등록되지 않은 상품만 반환
+    @Transactional(readOnly = true)
+    public List<Item> getAvailableItemsByStudentId(String studentId) {
+        // 학생이 등록한 전체 상품
+        List<Item> allItems = itemRepository.findByUserId(studentId);
+
+        // 이미 Rental 테이블에 등록된 상품 ID 가져오기
+        List<String> rentedItemIds = rentalRepository.findRentedItemIdsByStudentId(studentId);
+
+        // 사용 가능한 상품만 필터링
+        return allItems.stream()
+                .filter(item -> !rentedItemIds.contains(item.getItemId()))
+                .toList();
     }
 
     // 특정 사용자의 물품 수량 계산
@@ -146,6 +197,9 @@ public class ItemService {
         return errors;
     }
 
+    public List<Item> getItemsByStudentIdAndName(String studentId, String itemName) {
+        return itemRepository.findByItemNameAndUserId(itemName, studentId);
+    }
 
     // 특정 물품 조회
     @Transactional(readOnly = true)
