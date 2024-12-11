@@ -52,6 +52,7 @@
             <th>대여 상태</th>
             <th>작성 일자</th>
             <th>작성자</th>
+            <th>관심 수</th>
         </tr>
         </thead>
         <tbody>
@@ -61,6 +62,7 @@
             <td th:text="${post.rentalState}"></td>
             <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd').format(post.creationDay)}"></td>
             <td th:text="${post.student.name}"></td>
+            <td th:text="${post.interestCount}"></td>
         </tr>
         </tbody>
     </table>
