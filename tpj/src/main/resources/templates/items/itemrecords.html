@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/defaultLayout}"
+      layout:fragment="Content"
+>
+<head>
+    <title>나의 물품 기록</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 게시글 작성 버튼 스타일 */
+        .add-post-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        .add-post-button:hover {
+            background-color: #0056b3;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h1>나의 물품 기록</h1>
+
+    <!-- 대여해 준 기록 -->
+    <div class="container mt-4">
+        <h2>대여해 준 물품</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>물품 이름</th>
+                <th>대여 시작일</th>
+                <th>대여 종료일</th>
+                <th>반납 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${lentRecords}">
+                <td th:text="${record.item?.itemName}">물품 이름</td>
+                <td th:text="${record.rentStart}">대여 시작일</td>
+                <td th:text="${record.rentEnd}">대여 종료일</td>
+                <td th:text="${record.returnStatus}">반납 상태</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 대여 받은 기록 -->
+    <section class="mt-4">
+        <h2>대여 받은 물품</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>물품 이름</th>
+                <th>대여 시작일</th>
+                <th>대여 종료일</th>
+                <th>반납 상태</th>
+                <th>반납</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${borrowedRecords}">
+                <td th:text="${record.item?.itemName}">물품 이름</td>
+                <td th:text="${record.rentStart}">대여 시작일</td>
+                <td th:text="${record.rentEnd}">대여 종료일</td>
+                <td th:text="${record.returnStatus}">반납 상태</td>
+                <td>
+                    <!-- 반납 버튼 -->
+                    <form th:action="@{/rentals/{postId}/return(postId=${record.postId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                th:disabled="${record.returnStatus == '기한준수' || record.returnStatus == '기한초과'}">
+                            반납
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- 게시글 작성 버튼 -->
+<a href="/posts/add" class="add-post-button">게시글 작성</a>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

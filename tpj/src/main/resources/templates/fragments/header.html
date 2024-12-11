@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / headerFragment 임을 선언-->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="HeaderFragment">
+<div class="header">
+    <!-- 좌측: Home 버튼 -->
+    <div class="left">
+        <a href="/">Home</a>
+    </div>
+
+    <!-- 우측: 로그인 상태에 따라 버튼 표시 -->
+    <div class="right">
+            <span th:if="${session.loggedInUser == null}">
+                <!-- 로그아웃 상태 -->
+                <a href="/login">로그인</a>
+                <a href="/signup">회원가입</a>
+            </span>
+        <span th:if="${session.loggedInUser != null}">
+                <!-- 로그인 상태 -->
+                <span th:text=" ${session.loggedInUserName} + '님!'"></span>
+                <!-- 물품 등록 버튼 추가 -->
+                <a href="/items/list" style="margin-left: 10px;">물품 등록</a>
+                <!-- 물품 기록 버튼 추가 (새로 추가한 부분)-->
+                <a href="/items/records">물품 기록</a>
+                <a href="/logout" style="margin-left: 10px;">로그아웃</a>
+            </span>
+    </div>
+</div>
+</html>

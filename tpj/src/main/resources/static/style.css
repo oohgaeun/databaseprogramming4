@@ -1,0 +1,22 @@
+/* header 스타일 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: solid 1px yellow;
+}
+
+.header a {
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.header .left {
+    font-weight: bold;
+}
+
+.header .right {
+    display: flex;
+    align-items: center;
+}
