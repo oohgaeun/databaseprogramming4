@@ -27,7 +27,6 @@
                 <select class="form-select" id="rentalState" name="rentalState">
                     <option value="전체" th:selected="${param.rentalState == '전체' || param.rentalState == null}">전체</option>
                     <option value="대여가능" th:selected="${param.rentalState == '대여가능'}">대여가능</option>
-                    <option value="대여중" th:selected="${param.rentalState == '대여중'}">대여중</option>
                     <option value="대여대기" th:selected="${param.rentalState == '대여대기'}">대여대기</option>
                 </select>
             </div>
