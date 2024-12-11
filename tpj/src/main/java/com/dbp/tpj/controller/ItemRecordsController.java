@@ -1,36 +1,45 @@
 package com.dbp.tpj.controller;
 
 import com.dbp.tpj.domain.RentalHistory;
+import com.dbp.tpj.repository.RentalRepository;
 import com.dbp.tpj.service.RentalHistoryService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal; // Spring Security 사용 시 필요
+import java.util.List;
 
 @Controller
 @RequestMapping("/items")
 public class ItemRecordsController {
 
     private final RentalHistoryService rentalHistoryService;
+    private final RentalRepository rentalRepository;
 
-    public ItemRecordsController(RentalHistoryService rentalHistoryService) {
+    @Autowired
+    public ItemRecordsController(RentalHistoryService rentalHistoryService, RentalRepository rentalRepository) {
         this.rentalHistoryService = rentalHistoryService;
+        this.rentalRepository = rentalRepository;
     }
 
     @GetMapping("/records")
-    public String getItemRecords(Model model, Principal principal) {
-        //사용자 ID가 Null이면(오류이면)
-        if (principal == null) {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
+    public String getItemRecords(Model model, HttpSession session) {
+        String userId = (String) session.getAttribute("loggedInUser");
+        if (userId == null) {
+            return "redirect:/login";
         }
-        String userId = principal.getName(); // 로그인된 사용자 ID 가져오기(이 부분만 정의하면 될듯
 
-        // 대여 기록과 대여 받은 기록 조회
-        model.addAttribute("lentRecords", rentalHistoryService.getLentRecords(userId));
-        model.addAttribute("borrowedRecords", rentalHistoryService.getBorrowedRecords(userId));
+        // 대여 기록과 대여받은 기록 조회
+        List<RentalHistory> lentRecords = rentalHistoryService.getLentRecords(userId);
+        List<RentalHistory> borrowedRecords = rentalHistoryService.getBorrowedRecordsWithPostId(userId); // PostID 포함된 데이터 호출
 
-        return "items/itemrecords"; // 렌더링할 HTML 파일 경로
+        model.addAttribute("lentRecords", lentRecords);
+        model.addAttribute("borrowedRecords", borrowedRecords);
+
+        return "items/itemrecords";
     }
 }

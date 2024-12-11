@@ -36,13 +36,13 @@
 <div class="container mt-4">
     <h1>나의 물품 기록</h1>
 
-    <!-- 대여 기록 -->
-    <section>
-        <h2>대여 기록</h2>
+    <!-- 대여해 준 기록 -->
+    <div class="container mt-4">
+        <h2>대여해 준 물품</h2>
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>물품명</th>
+                <th>물품 이름</th>
                 <th>대여 시작일</th>
                 <th>대여 종료일</th>
                 <th>반납 상태</th>
@@ -50,10 +50,10 @@
             </thead>
             <tbody>
             <tr th:each="record : ${lentRecords}">
-                <td th:text="${record.itemName}"></td>
-                <td th:text="${#dates.format(record.rentStart, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#dates.format(record.rentEnd, 'yyyy-MM-dd') ?: '진행 중'}"></td>
-                <td th:text="${record.returnStatus}"></td>
+                <td th:text="${record.item?.itemName}">물품 이름</td>
+                <td th:text="${record.rentStart}">대여 시작일</td>
+                <td th:text="${record.rentEnd}">대여 종료일</td>
+                <td th:text="${record.returnStatus}">반납 상태</td>
             </tr>
             </tbody>
         </table>
@@ -61,32 +61,30 @@
 
     <!-- 대여 받은 기록 -->
     <section class="mt-4">
-        <h2>대여 받은 기록</h2>
+        <h2>대여 받은 물품</h2>
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>물품명</th>
+                <th>물품 이름</th>
                 <th>대여 시작일</th>
                 <th>대여 종료일</th>
-                <th>대여 해준 사람</th>
                 <th>반납 상태</th>
-                <th>작업</th>
+                <th>반납</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="record : ${borrowedRecords}">
-                <td th:text="${record.item.itemName}"></td>
-                <td th:text="${#dates.format(record.rentStart, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#dates.format(record.rentEnd, 'yyyy-MM-dd') ?: '진행 중'}"></td>
-                <td th:text="${record.lender.name}"></td>
-                <td th:text="${record.returnStatus}"></td>
+                <td th:text="${record.item?.itemName}">물품 이름</td>
+                <td th:text="${record.rentStart}">대여 시작일</td>
+                <td th:text="${record.rentEnd}">대여 종료일</td>
+                <td th:text="${record.returnStatus}">반납 상태</td>
                 <td>
                     <!-- 반납 버튼 -->
-                    <form th:if="${record.borrower.id == session.loggedInUser}"
-                          th:action="@{/items/records/{rentalId}/return(rentalId=${record.historyId})}"
-                          method="post"
-                          style="display: inline;">
-                        <button type="submit" class="btn btn-danger">반납</button>
+                    <form th:action="@{/rentals/{postId}/return(postId=${record.postId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                th:disabled="${record.returnStatus == '기한준수' || record.returnStatus == '기한초과'}">
+                            반납
+                        </button>
                     </form>
                 </td>
             </tr>

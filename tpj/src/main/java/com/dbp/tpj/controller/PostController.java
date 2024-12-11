@@ -234,6 +234,10 @@ public class PostController {
 
         // 댓글 상태를 "승낙"으로 변경
         Chat chat = chatService.getChatById(chatId);
+        if ("승낙".equals(chat.getStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "이미 승인된 댓글입니다.");
+            return "redirect:/posts/" + postId;
+        }
         chat.setStatus("승낙"); // 여기서 필드 이름 수정
         chatService.saveChat(chat);
 

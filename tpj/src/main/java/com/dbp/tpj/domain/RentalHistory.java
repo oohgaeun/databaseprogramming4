@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "rentalHistory")
+@Table(name = "rentalhistory") // <- H를 h로 바꾸어야 한다
 public class RentalHistory {
 
     @Id
@@ -17,20 +17,25 @@ public class RentalHistory {
     @Column(name = "Rentend")
     private LocalDate rentEnd; // 대여 종료일 (반납 안 된 경우 NULL)
 
-    @Column(name = "ReturnStatus", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "LenderID", referencedColumnName = "StudentID")
+    private Student lender;
+
+    @ManyToOne
+    @JoinColumn(name = "BorrowerID", referencedColumnName = "StudentID")
+    private Student borrower;
+
+    @ManyToOne
+    @JoinColumn(name = "ItemID", referencedColumnName = "ItemID")
+    private Item item; // 대여된 물품
+
+    @Column(name = "returnstatus", nullable = false)
     private String returnStatus; // 반납 상태 ('기한준수', '기한초과', '미반납')
 
-    @ManyToOne
-    @JoinColumn(name = "LenderID", nullable = false)
-    private Student lender; // 대여자 (학생)
+    @Transient // 테이블에 영향을 미치지 않음
+    private Long postId;
 
-    @ManyToOne
-    @JoinColumn(name = "BorrowerID", nullable = false)
-    private Student borrower; // 대여받은 자 (학생)
 
-    @ManyToOne
-    @JoinColumn(name = "ItemID", nullable = false)
-    private Item item; // 대여된 물품
 
     // 기본 생성자
     public RentalHistory() {
@@ -103,5 +108,13 @@ public class RentalHistory {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 }

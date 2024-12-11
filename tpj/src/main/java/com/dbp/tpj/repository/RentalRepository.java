@@ -34,5 +34,7 @@ public interface RentalRepository extends JpaRepository<Rental, RentalId> {
     @Query(value = "UPDATE items SET rental_state = '대여중', return_day = SYSDATE + 7 WHERE item_id = :itemId", nativeQuery = true)
     void markItemAsRented(@Param("itemId") String itemId);
 
+    @Query("SELECT r.post.postId FROM Rental r WHERE r.item.itemId = :itemId")
+    Long findPostIdByItemId(@Param("itemId") String itemId);
 
 }

@@ -58,14 +58,15 @@
           <p>
             <strong th:text="${chat.student?.name}"></strong>님
             <!-- 댓글 리스트에서 대여 승낙 버튼 게시글 작성자가 로그인한 사용자와 같을 경우 -->
-          <form th:if="${post.student.id == session.loggedInUser}"
+          <form th:if="${post.student.id == session.loggedInUser && chat.status != '승낙'}"
                 th:action="@{/posts/{postId}/comments/{chatId}/accept(postId=${post.postId}, chatId=${chat.chatId})}"
-                method="post"
-                style="display: inline;">
-            <button type="submit" class="btn btn-success btn-sm float-end">
-              승낙
-            </button>
+                method="post" style="display: inline;">
+            <button type="submit" class="btn btn-success btn-sm float-end">승낙</button>
           </form>
+          <!-- 이미 승낙된 경우 -->
+          <span th:if="${chat.status == '승낙'}" class="btn btn-secondary btn-sm float-end disabled">
+            이미 승인됨
+          </span>
             <!-- 삭제 버튼: 현재 사용자와 댓글 작성자가 같을 경우에만 표시 -->
           <form th:if="${chat.student.id == session.loggedInUser}"
                 th:action="@{/posts/{postId}/comments/{chatId}/delete(postId=${post.postId}, chatId=${chat.chatId})}"

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Pattern;
 @Table(name = "students")
 public class Student {
     @Id
-    @Column(name = "ID") //StudentID가 제 테이블에 ID로 되어 있어서 잠시만 ID로 바꿈니다. 만약 다시 변경 안했으면 이것만 StudentID로
+    @Column(name = "StudentID")
     private String id;
 
     @Column(name = "PW", nullable = false)
